@@ -57,7 +57,7 @@ public class ChatServerThread extends Thread {
 			
 
 		} catch (SocketException e) {
-			ChatServer.log("sudden closed by client...");
+			ChatServer.log("Suddenly closed by client...");
 		} catch (IOException e) {
 			ChatServer.log(e.toString());
 		} finally {
@@ -69,7 +69,7 @@ public class ChatServerThread extends Thread {
 			} catch (IOException e) {
 				ChatServer.log(e.toString());
 			} finally {
-				ChatServer.log("close connection with - " + remoteHostAddress + ":" + remotePort);
+				ChatServer.log("Closed connection with - " + remoteHostAddress + ":" + remotePort);
 			}
 		}
 

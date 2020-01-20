@@ -63,33 +63,14 @@ public class ChatClientApp {
 			System.out.println("error - " + e);
 		} finally {
 			try {
-				// 7. 창을 닫았으면, 'quit' 프로토콜을 날린다.
-				while (true) {
-					writer.println("quit");
-					writer.flush();
-					String response = reader.readLine();
-					if (response.equalsIgnoreCase("quit:ok")) {
-						log("QUIT:OK 수신 완료");
-						break;
-					} else {
-						log("연결을 아직 끊지 못했습니다.");
-					}
+				if (socket != null && socket.isClosed() != true) {
+					socket.close();
 				}
-
 			} catch (IOException e) {
-				log("error - " + e);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} finally {
-				try {
-					if (socket != null && socket.isClosed() != true) {
-						socket.close();
-					}
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} finally {
-					log("closed connection with server.");
-				}
-
+				log("closed connection with server.");
 			}
 
 		}
