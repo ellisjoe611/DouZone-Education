@@ -82,6 +82,8 @@ public class ChatWindow {
 			public void windowOpened(WindowEvent e) {
 				displayThread = new ChatDisplayThread();
 				displayThread.start();
+				
+				textArea.setText("<서버와 연결되었습니다. 채팅 시작!>\n\n귓속말 방법 :\t유저명;;귓속말내용\n\n");
 			}
 
 			// 윈도우 닫기 버튼을 눌렀을 때에 할 일. 아래의 행동들이 끝난 다음에야 윈도우가 닫힌다.
@@ -101,6 +103,7 @@ public class ChatWindow {
 					while (true) {
 						writer.println("quit");
 						writer.flush();
+						
 						String response = reader.readLine();
 						if (response.equalsIgnoreCase("quit:ok")) {
 							System.out.println("QUIT:OK 수신 완료");
@@ -111,12 +114,18 @@ public class ChatWindow {
 					}
 
 				} catch (InterruptedException e1) {
-					System.out.println("[ChatWindow.java] ERROR - 창 닫는 도중 interrupt exception 발생...");
+					System.out.println("[ChatWindow.java] ERROR - ChatDisplayThread 상에서의 interrupt 발생...");
 					e1.printStackTrace();
 				} catch (IOException e1) {
 					System.out.println("[ChatWindow.java] ERROR - 창 닫는 도중 IO exception 발생...");
 				} finally {
 					try {
+						if (reader != null) {
+							reader.close();
+						}
+						if (writer != null) {
+							writer.close();
+						}
 						if (socket != null && socket.isClosed() != true) {
 							socket.close();
 						}
@@ -194,11 +203,11 @@ public class ChatWindow {
 				e.printStackTrace();
 			} finally {
 				try {
-					if (socket != null && socket.isClosed() != true) {
-						socket.close();
+					if (reader != null) {
+						reader.close();
 					}
 				} catch (IOException e) {
-					System.out.println("[ChatWindow.java] ERROR - ChatDisplayThread 에서 소켓 종료 실패...");
+					System.out.println("[ChatWindow.java] ERROR - ChatDisplayThread 에서 종료 실패...");
 					e.printStackTrace();
 				} finally {
 					System.out.println("Display Thread 종료.");

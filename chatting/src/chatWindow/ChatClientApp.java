@@ -63,6 +63,12 @@ public class ChatClientApp {
 			System.out.println("error - " + e);
 		} finally {
 			try {
+				if (reader != null) {
+					reader.close();
+				}
+				if (writer != null) {
+					writer.close();
+				}
 				if (socket != null && socket.isClosed() != true) {
 					socket.close();
 				}

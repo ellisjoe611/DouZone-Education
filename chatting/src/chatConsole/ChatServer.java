@@ -11,7 +11,7 @@ public class ChatServer {
 	public static void main(String[] args) {
 		// 필요한 변수들 준비하기
 		ServerSocket serverSocket = null;
-		
+
 		try {
 			// 서버 소켓 생성하기
 			serverSocket = new ServerSocket();
@@ -19,9 +19,9 @@ public class ChatServer {
 			// 서버 소켓에 bind 시키기
 			serverSocket.bind(new InetSocketAddress(SERVER_ADDRESS, SERVER_PORT));
 			log("Server Starts...[port:" + SERVER_PORT + "]");
-			
-			while(true) {
-				Socket socket = serverSocket.accept();	//blocked 되는 상태
+
+			while (true) {
+				Socket socket = serverSocket.accept(); // blocked 되는 상태
 				System.out.println("ACCEPTED");
 				new ChatServerThread(socket).start();
 			}
@@ -39,9 +39,9 @@ public class ChatServer {
 		}
 
 	}
-	
+
 	public static void log(String s) {
 		System.out.println("[Server] " + s);
 	}
-	
+
 }

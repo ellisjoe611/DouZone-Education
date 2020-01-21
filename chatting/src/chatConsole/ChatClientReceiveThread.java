@@ -18,7 +18,7 @@ public class ChatClientReceiveThread extends Thread {
 			reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 
 			while (true) {
-				String msgFromServer = reader.readLine();	//blocked 상태
+				String msgFromServer = reader.readLine(); // blocked 상태
 				if (msgFromServer == null) {
 					ChatClient.log("error - 연결이 끊어짐");
 					break;
@@ -36,6 +36,9 @@ public class ChatClientReceiveThread extends Thread {
 			e.printStackTrace();
 		} finally {
 			try {
+				if (reader != null) {
+					reader.close();
+				}
 				if (socket != null && socket.isClosed() != true) {
 					socket.close();
 				}

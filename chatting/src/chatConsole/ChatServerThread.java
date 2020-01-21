@@ -8,8 +8,7 @@ public class ChatServerThread extends Thread {
 	private String userName;
 	private Socket socket;
 	private static Map<String, Writer> writerMap = Collections.synchronizedMap(new HashMap<String, Writer>());
-	
-	
+
 	public ChatServerThread(Socket s) {
 		this.socket = s;
 	}
@@ -31,8 +30,8 @@ public class ChatServerThread extends Thread {
 			// 2. Stream 얻기
 			reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 			writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), false); // auto
-																													// flush
-																													// 끔
+																										// flush
+																										// 끔
 
 			// 3. 요청 처리
 			while (true) {
@@ -54,7 +53,6 @@ public class ChatServerThread extends Thread {
 					ChatServer.log("Error: 알 수 없는 요청 (" + tokens[0] + ")");
 				}
 			}
-			
 
 		} catch (SocketException e) {
 			ChatServer.log("Suddenly closed by client...");
@@ -63,6 +61,13 @@ public class ChatServerThread extends Thread {
 		} finally {
 			try {
 				doQuit(writer);
+
+				if (reader != null) {
+					reader.close();
+				}
+				if (writer != null) {
+					writer.close();
+				}
 				if (socket.isClosed() != true && socket != null) {
 					socket.close();
 				}
@@ -83,8 +88,8 @@ public class ChatServerThread extends Thread {
 		printWriter.println("quit:ok");
 		printWriter.flush();
 
-		//전체에게 보내기
-		broadcast(this.userName + " 님이 퇴장하였습니다.");
+		// 전체에게 보내기
+		broadcast("<" + this.userName + " 님이 퇴장하였습니다.>");
 	}
 
 	private void removeWriter(String userName) {
@@ -98,23 +103,22 @@ public class ChatServerThread extends Thread {
 		if (msg.contains(";;")) {
 			// user;;secret_message
 			String[] secretMsgToken = msg.split(";;");
-			
+
 			PrintWriter senderPrintWriter = (PrintWriter) writer;
 			PrintWriter receiverPrintWriter = (PrintWriter) writerMap.get(secretMsgToken[0]);
 			receiverPrintWriter.println(this.userName + "[SECRET] : " + secretMsgToken[1]);
 			senderPrintWriter.println(this.userName + "[SECRET] : " + secretMsgToken[1]);
-			
+
 			senderPrintWriter.flush();
 			receiverPrintWriter.flush();
-			
-			
+
 		} else {
 			broadcast(this.userName + " : " + msg);
 		}
 	}
 
 	private void doJoin(String name, Writer writer) {
-		//만약 중복된 유저가 있으면 거절 프로토콜을 전송한다.
+		// 만약 중복된 유저가 있으면 거절 프로토콜을 전송한다.
 		if (writerMap.containsKey(name)) {
 			// ACK 보내주기 (join:already_exists)
 			PrintWriter printWriter = (PrintWriter) writer;
@@ -122,9 +126,9 @@ public class ChatServerThread extends Thread {
 			printWriter.flush(); // 정리
 			return;
 		}
-		
+
 		this.userName = name;
-		broadcast(name + " 님이 입장하였습니다.");
+		broadcast("<" + name + " 님이 입장하였습니다.>");
 
 		// writer pool에 저장
 		addWriter(name, writer);
@@ -140,7 +144,6 @@ public class ChatServerThread extends Thread {
 			for (Writer writer : writerMap.values()) {
 				PrintWriter printWriter = (PrintWriter) writer;
 				printWriter.println(data);
-
 				printWriter.flush(); // 내보내기
 			}
 		}
