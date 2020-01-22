@@ -103,14 +103,22 @@ public class ChatServerThread extends Thread {
 		if (msg.contains(";;")) {
 			// user;;secret_message
 			String[] secretMsgToken = msg.split(";;");
-
 			PrintWriter senderPrintWriter = (PrintWriter) writer;
-			PrintWriter receiverPrintWriter = (PrintWriter) writerMap.get(secretMsgToken[0]);
-			receiverPrintWriter.println(this.userName + "[SECRET] : " + secretMsgToken[1]);
-			senderPrintWriter.println(this.userName + "[SECRET] : " + secretMsgToken[1]);
 
-			senderPrintWriter.flush();
-			receiverPrintWriter.flush();
+			if (writerMap.containsKey(secretMsgToken[0]) != true) {
+				senderPrintWriter.println("[" + secretMsgToken[0] + " 이름의 유저가 존재하지 않습니다..]");
+				senderPrintWriter.flush();
+			} else {
+				PrintWriter receiverPrintWriter = (PrintWriter) writerMap.get(secretMsgToken[0]);
+				
+				if(receiverPrintWriter.equals(senderPrintWriter) != true) {
+					receiverPrintWriter.println(this.userName + "[SECRET] : " + secretMsgToken[1]);
+				}				
+				senderPrintWriter.println(this.userName + "[SECRET] : " + secretMsgToken[1]);
+
+				receiverPrintWriter.flush();
+				senderPrintWriter.flush();
+			}
 
 		} else {
 			broadcast(this.userName + " : " + msg);
