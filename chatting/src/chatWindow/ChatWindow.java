@@ -93,25 +93,17 @@ public class ChatWindow {
 				PrintWriter writer = null;
 
 				try {
-					// 1. 우선 displayThread 종료
+					// 1. 우선 displayThread을 일시적으로 join 시킨다.
 					displayThread.join(100);
 
 					// 2. QUIT 프로토콜 처리하기
 					reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 					writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), false);
 
-					while (true) {
-						writer.println("quit");
-						writer.flush();
-						
-						String response = reader.readLine();
-						if (response.equalsIgnoreCase("quit:ok")) {
-							System.out.println("QUIT:OK 수신 완료");
-							break;
-						} else {
-							System.out.println("연결을 아직 끊지 못했습니다.");
-						}
-					}
+					writer.println("quit");
+					writer.flush();
+					
+					Thread.sleep(100);
 
 				} catch (InterruptedException e1) {
 					System.out.println("[ChatWindow.java] ERROR - ChatDisplayThread 상에서의 interrupt 발생...");
@@ -133,7 +125,7 @@ public class ChatWindow {
 						System.out.println("[ChatWindow.java] ERROR - 소켓 종료 실패...");
 						e1.printStackTrace();
 					} finally {
-						System.out.println("서버와의 연결 종료 완료. 감사합니다!");
+						System.out.println("ChatWindow 종료.");
 						System.exit(0);
 					}
 					
@@ -188,6 +180,8 @@ public class ChatWindow {
 					String msgFromServer = reader.readLine(); // blocked 상태
 					if (msgFromServer == null) {
 						System.out.println("[ChatWindow.java] ERROR - 연결이 끊어짐...");
+						return;
+					} else if (msgFromServer.equalsIgnoreCase("quit:ok")) {
 						return;
 					} else {
 						textArea.append(msgFromServer);
